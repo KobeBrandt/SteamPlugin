@@ -73,7 +73,7 @@ namespace Loupedeck.SteamPlugin
 
             if (OperatingSystem.IsMacOS())
             {
-                var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Library", "Application Support", "Steam");
+                var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Application Support", "Steam");
                 return Directory.Exists(path) ? path : null;
             }
 
