@@ -2,6 +2,8 @@ namespace Loupedeck.SteamPlugin
 {
     using System;
     using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
 
     // This class adds one action per Steam game installed on this computer, in the "Library" group.
     // Each action launches its game using the steam:// protocol.
@@ -48,6 +50,30 @@ namespace Loupedeck.SteamPlugin
             catch (Exception ex)
             {
                 PluginLog.Error(ex, $"Failed to launch {uri}");
+            }
+        }
+
+        // This method is called when a game's button is drawn. Shows the game's Steam icon, scaled to fill the button.
+        // Returning null falls back to showing the game's name.
+        protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize)
+        {
+            var game = this.Library.Games.FirstOrDefault(g => g.AppId.ToString() == actionParameter);
+            if (game?.IconPath == null || !File.Exists(game.IconPath))
+            {
+                return null;
+            }
+
+            try
+            {
+                using var icon = BitmapImage.FromFile(game.IconPath);
+                using var bitmapBuilder = new BitmapBuilder(imageSize);
+                bitmapBuilder.DrawImage(icon, 0, 0, bitmapBuilder.Width, bitmapBuilder.Height);
+                return bitmapBuilder.ToImage();
+            }
+            catch (Exception ex)
+            {
+                PluginLog.Warning(ex, $"Could not load icon for {game.Name} from '{game.IconPath}'");
+                return null;
             }
         }
 

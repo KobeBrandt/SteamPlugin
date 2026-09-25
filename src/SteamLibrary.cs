@@ -8,18 +8,22 @@ namespace Loupedeck.SteamPlugin
 
     using Microsoft.Win32;
 
-    // A game installed through Steam on this computer.
-    public record SteamGame(UInt32 AppId, String Name);
+    // A game installed through Steam on this computer. IconPath is null when Steam has no cached icon for it.
+    public record SteamGame(UInt32 AppId, String Name, String IconPath);
 
     // This class finds the games installed on this computer by reading Steam's local library files:
     //   <Steam>/steamapps/libraryfolders.vdf lists every library folder (one per drive the user added),
-    //   <library>/steamapps/appmanifest_<appid>.acf describes each installed game.
+    //   <library>/steamapps/appmanifest_<appid>.acf describes each installed game,
+    //   <Steam>/appcache/librarycache/<appid>/<hash>.jpg is the game's icon.
     // It also watches those folders so the list updates when a game is installed or uninstalled.
 
     public class SteamLibrary : IDisposable
     {
         // Steamworks Common Redistributables: installed alongside games, but not something you launch.
         private const UInt32 RedistributablesAppId = 228980;
+
+        // Matches the icon file name in a game's librarycache folder: a 40-character hash followed by ".jpg".
+        private static readonly Regex IconFileNameRegex = new Regex(@"^[0-9a-f]{40}\.jpg$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         // Matches a "key" "value" line in Steam's VDF/ACF text format.
         private static readonly Regex KeyValueRegex = new Regex("^\\s*\"(?<key>[^\"]+)\"\\s+\"(?<value>(?:[^\"\\\\]|\\\\.)*)\"", RegexOptions.Compiled);
@@ -43,9 +47,10 @@ namespace Loupedeck.SteamPlugin
             }
 
             var libraryFolders = GetLibraryFolders(steamPath);
+            var libraryCacheFolder = Path.Combine(steamPath, "appcache", "librarycache");
 
             this.Games = libraryFolders
-                .SelectMany(GetInstalledGames)
+                .SelectMany(folder => GetInstalledGames(folder, libraryCacheFolder))
                 .Where(game => game.AppId != RedistributablesAppId)
                 .DistinctBy(game => game.AppId)
                 .OrderBy(game => game.Name, StringComparer.OrdinalIgnoreCase)
@@ -93,7 +98,7 @@ namespace Loupedeck.SteamPlugin
                 .ToList();
         }
 
-        private static IEnumerable<SteamGame> GetInstalledGames(String steamAppsFolder)
+        private static IEnumerable<SteamGame> GetInstalledGames(String steamAppsFolder, String libraryCacheFolder)
         {
             foreach (var manifestFile in Directory.EnumerateFiles(steamAppsFolder, "appmanifest_*.acf"))
             {
@@ -102,9 +107,21 @@ namespace Loupedeck.SteamPlugin
 
                 if (UInt32.TryParse(appIdText, out var appId) && !String.IsNullOrWhiteSpace(name))
                 {
-                    yield return new SteamGame(appId, name);
+                    yield return new SteamGame(appId, name, FindIconPath(libraryCacheFolder, appId));
                 }
             }
+        }
+
+        private static String FindIconPath(String libraryCacheFolder, UInt32 appId)
+        {
+            var gameCacheFolder = Path.Combine(libraryCacheFolder, appId.ToString());
+            if (!Directory.Exists(gameCacheFolder))
+            {
+                return null;
+            }
+
+            return Directory.EnumerateFiles(gameCacheFolder, "*.jpg")
+                .FirstOrDefault(file => IconFileNameRegex.IsMatch(Path.GetFileName(file)));
         }
 
         // Returns every value for the given key in a VDF/ACF file, with escaped characters (e.g. "\\") unescaped.
