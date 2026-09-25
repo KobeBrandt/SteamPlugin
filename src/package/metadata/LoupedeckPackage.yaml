@@ -21,10 +21,10 @@ pluginFileName: SteamPlugin.dll
 version: 1.0
 
 # Author of the plugin. The author can be a company or an individual developer.
-author: Admin
+author: KBrandt.dev
 
 # Copyright information.
-copyright: Copyright © 2026 Admin. All rights reserved.
+copyright: Copyright © 2026 KBrandt.dev. All rights reserved.
 
 
 # ==================================================================================================
