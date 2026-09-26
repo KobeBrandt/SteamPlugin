@@ -18,7 +18,7 @@ description: Add a short description of the plugin here.
 pluginFileName: SteamPlugin.dll
 
 # Plugin version.
-version: 0.3
+version: 1.0.0
 
 # Author of the plugin. The author can be a company or an individual developer.
 author: KBrandt.dev
