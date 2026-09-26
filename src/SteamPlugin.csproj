@@ -21,7 +21,7 @@
     <BaseOutputPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\bin\'))</BaseOutputPath>
     <OutputPath>$(BaseOutputPath)$(Configuration)\bin\</OutputPath>
 
-    <PluginShortName>Steam</PluginShortName>
+    <PluginShortName>SteamPlugin</PluginShortName>
   </PropertyGroup>
 
   <ItemGroup>
