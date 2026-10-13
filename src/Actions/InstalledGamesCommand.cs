@@ -21,7 +21,7 @@ namespace Loupedeck.SteamPlugin
             this.GroupName = LibraryGroupName;
         }
 
-        private SteamLibrary Library => ((SteamPlugin)this.Plugin).Library;
+        private SteamLibrary Library => ((SteamLauncherPlugin)this.Plugin).Library;
 
         // This method is called when the action is loaded; the Plugin property is available from here on.
         protected override Boolean OnLoad()

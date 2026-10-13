@@ -6,19 +6,19 @@
 type: plugin4
 
 # Name that identifies the plugin.
-name: Steam
+name: SteamLauncher
 
 # Plugin name that is shown to the user.
 displayName: Steam
 
 # Short description of the plugin.
-description: Add a short description of the plugin here.
+description: Launch your installed Steam games with one press from your Logitech or Loupedeck device.
 
 # Name of the plugin library file.
 pluginFileName: SteamPlugin.dll
 
 # Plugin version.
-version: 1.0.0
+version: 1.0.1
 
 # Author of the plugin. The author can be a company or an individual developer.
 author: KBrandt.dev

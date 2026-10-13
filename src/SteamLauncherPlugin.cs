@@ -4,7 +4,7 @@ namespace Loupedeck.SteamPlugin
 
     // This class contains the plugin-level logic of the Loupedeck plugin.
 
-    public class SteamPlugin : Plugin
+    public class SteamLauncherPlugin : Plugin
     {
         // Gets a value indicating whether this is an API-only plugin.
         public override Boolean UsesApplicationApiOnly => true;
@@ -16,7 +16,7 @@ namespace Loupedeck.SteamPlugin
         public SteamLibrary Library { get; }
 
         // Initializes a new instance of the plugin class.
-        public SteamPlugin()
+        public SteamLauncherPlugin()
         {
             // Initialize the plugin log.
             PluginLog.Init(this.Log);
